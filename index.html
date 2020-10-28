@@ -698,7 +698,7 @@ function gloseTreningGlose() {
 		//Sett opp tekst
 		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
 		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
-		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
 		document.getElementById("treningVenstre").innerHTML = "Klar";
 		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
 		document.getElementById("treningUnder").innerHTML = "Full kontroll";
@@ -718,7 +718,7 @@ function gloseTreningGlose() {
 function gloseTreningKlar() {
 
 	//Sett opp tekst
-	document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
+	document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
 	document.getElementById("treningVenstre").innerHTML = "Riktig";
 	document.getElementById("treningHoyre").innerHTML = "Galt";
 
@@ -741,7 +741,7 @@ function gloseTreningVetIkke() {
 	
 	//Sett opp tekst
 	document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
-	document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
+	document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
 	document.getElementById("treningVenstre").innerHTML = "---";
 	document.getElementById("treningHoyre").innerHTML = "Fortsett";
 	document.getElementById("treningUnder").innerHTML = "---";
@@ -776,7 +776,7 @@ function gloseTreningKontroll() {
 		//Sett opp tekst
 		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
 		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
-		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
 		document.getElementById("treningVenstre").innerHTML = "Klar";
 		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
 		document.getElementById("treningUnder").innerHTML = "Full kontroll";
@@ -808,7 +808,7 @@ function gloseTreningGloseGalt() {
 		//Sett opp tekst
 		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
 		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
-		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
 		document.getElementById("treningVenstre").innerHTML = "Klar";
 		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
 		document.getElementById("treningUnder").innerHTML = "Full kontroll";
@@ -839,7 +839,7 @@ function gloseTreningGloseRiktig() {
 		//Sett opp tekst
 		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
 		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
-		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
 		document.getElementById("treningVenstre").innerHTML = "Klar";
 		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
 		document.getElementById("treningUnder").innerHTML = "Full kontroll";
@@ -876,7 +876,7 @@ function gloseTreningRepGlose(){
 		//Sett opp tekst
 		document.getElementById("treningFrekvens").innerHTML = ordliste[ordTilRep[progresjon]][3];
 		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[ordTilRep[progresjon]+innstillinger];
-		document.getElementById("treningGlose").innerHTML = ordliste[ordTilRep[progresjon]][0];
+		document.getElementById("treningGlose").innerHTML = ordliste[ordTilRep[progresjon]][1];
 		document.getElementById("treningVenstre").innerHTML = "---";
 		document.getElementById("treningHoyre").innerHTML = "Fortsett";
 		document.getElementById("treningUnder").innerHTML = "---";
@@ -894,7 +894,7 @@ function gloseTreningRepGlose(){
 function gloseTreningRepSvar(){
 
 	//Sett opp tekst
-	document.getElementById("treningGlose").innerHTML = ordliste[ordTilRep[progresjon]][1];
+	document.getElementById("treningGlose").innerHTML = ordliste[ordTilRep[progresjon]][0];
 	
 	//Gi knappene sine funksjoner
 	document.getElementById("treningHoyre").onclick = gloseTreningRepGlose;
@@ -1198,7 +1198,7 @@ function gloseTidVisGlose() {
 	//Sett opp tekst
 	document.getElementById("treningFrekvens").innerHTML = ordliste[gloseTidAktivGlose[1]][3]; // gloseTidTelling;
 	document.getElementById("treningScore").innerHTML = gloseTidAktivGlose[0];
-	document.getElementById("treningGlose").innerHTML = ordliste[gloseTidAktivGlose[1]][0];
+	document.getElementById("treningGlose").innerHTML = ordliste[gloseTidAktivGlose[1]][1];
 	document.getElementById("treningVenstre").innerHTML = "---";
 	document.getElementById("treningMidt").innerHTML = "Klar (n)";
 	document.getElementById("treningHoyre").innerHTML = "---";
@@ -1212,7 +1212,7 @@ function gloseTidVisGlose() {
 
 function gloseTidVisFasit() {
 	//Sett opp tekst
-	document.getElementById("treningGlose").innerHTML = ordliste[gloseTidAktivGlose[1]][1];
+	document.getElementById("treningGlose").innerHTML = ordliste[gloseTidAktivGlose[1]][0];
 	document.getElementById("treningVenstre").innerHTML = "For lett (b)";
 	document.getElementById("treningMidt").innerHTML = "Riktig (n)";
 	document.getElementById("treningHoyre").innerHTML = "Galt (m)";
