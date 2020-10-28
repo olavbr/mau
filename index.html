@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+	html, body {
+	font : 16px Arial;
+	height: 100%;
+	}
+  #bunn {
+  	width: 100%;
+    position : absolute;
+    bottom: 0;
+    height : 40px;
+    margin-top : 0px;
+    border-top: 2px solid #880000;
+    padding-top: 8px;
+  }
+  #overskrift {
+  	font: 14px;
+  }
+  div.helesiden {
+  	max-width : 600px;
+  	margin: auto;
+  	margin-top: 0px;
+  	min-height: 100%;
+  	position: relative;
+  }
+  #innhold {
+  	width :100%;
+  	padding-bottom:40px;
+  }
+  div.topp {
+  	background-color : #880000;
+  	color: #FFFFFF;
+  }
+  div.navigasjon {
+  	text-align: center;
+  }
+  h1 {
+    font: 30px arial;
+    text-align: center;
+    line-height: 50%;
+  }
+  a.knapp:link, a.knapp:visited {
+    display: inline-block;
+    border: 2px solid white;
+    color: white;
+    padding: 7px 15px;
+    text-align: center;	
+    text-decoration: none;
+    font: 16px arial;
+	}
+	span.sporsmal {
+	}
+	span.riktig {
+		font: 14px arial;
+		color: green;
+	}
+	span.feil {
+		font: 14px arial;
+		color: red;
+	}
+	span.hoyre {
+		float: right;
+	}
+	span.glose {
+		font: 30px;
+	}
+	button.alternativ {
+  		font: 20px;
+  	}
+	a.knapp:hover {
+    	background-color: #ffffff;
+    	color: #880000;
+	}
+	
+	a.knapp:active {
+    	background-color: lightgreen;
+	}
+	div.halv {
+		width: 45%;
+		float: left;
+		padding-right: 2%;
+	}
+	div.resten {
+		float: left;
+		width: 45%;
+		padding-left: 2%;
+		border-left: 1px solid black;
+	}
+	#treningFlashcard {
+		width: 400px;
+		height: 200px;
+		margin: auto;
+		border: 2px solid black;
+		text-align: center;
+		line-height: 200px;
+		
+	}
+	#treningGlose {
+		font: 28px;
+		display: inline-block;
+		vertical-align: middle;
+		line-height: 25px;
+	}
+	#treningVenstre {
+		float: left;
+	}
+	#treningMidt {
+		display: block;
+		margin: auto;
+	}
+	#treningHoyre {
+		float: right;
+	}
+	#treningUnder {
+		display: block;
+		margin: auto;
+	}
+	#treningKnapper {
+		width: 200px;
+		margin: auto;
+	}
+	#tidKnapper {
+		width: 400px;
+		margin: auto;
+	}
+	#treningInnstillinger {
+		float: right;
+	}
+	.box {
+		float: left;
+  		width: 33.33%;
+	}
+	.stat {
+		background-color: #880000;
+		width: 100%;
+	}
+	td {
+		vertical-align: bottom;
+		text-align: center;
+	}
+	table {
+		table-layout: fixed;
+		margin: auto;
+	}
+</style>
+
+
+<script>
+"use strict";
+// Innfoer indexOf hvis den ikke finnes i browseren
+if (!Array.prototype.indexOf)
+  Array.prototype.indexOf = function(searchValue, index) {
+    // In non-strict-mode, if the `this` variable is null
+    // or undefined, then it is set the the window object.
+    // Else, `this` is automaticly converted to an object.
+    var len = this.length >>> 0; // convert ot number or 0
+    
+    index |= 0;              // rounds and NaN-checks
+    if (index < 0)             // check if negative start
+      index = Math.max(len - index, 0);
+    else if (index >= len) // else, check if too big
+      return -1;
+    
+    if (searchValue === undefined)
+      // Because searchValue is undefined, keys that
+      // don't exist will have the same value as the
+      // searchValue, and thus do need to be checked.
+      do {
+        if (index in this && this[index] === undefined)
+          return index;
+      } while (++index !== len)
+    else
+      // Because searchValue is not undefined, there's no
+      // need to check if the current key is in the array
+      // because if the key isn't in the array, then it's
+      // undefined which is not equal to the searchValue.
+      do {
+        if (this[index] === searchValue)
+          return index;
+      } while (++index !== len)
+    
+    // if nothing was found, then simply return -1
+    return -1;
+  };
+
+// Globale variabler:
+var innstillinger = 2;
+var alternativer = 0;
+var tilfeldigTallListe = 0;
+var progresjon = 0;
+var utvalg = [];
+var ordTilRep = [];
+var revers = 0;
+var poengsum = 0;
+var glosetreningMidlertidig = [];
+
+var gloseTidAktivGlose = [0];
+var tidsintervaller = [5000, 25000, 120000, 600000, 3600000, 18000000, 86400000, 432000000, 2160000000, 10368000000, 63072000000]
+var gloseTidTelling = 0
+
+var ordliste = [['t&#225;man (k&#603;)', 'g&#229;', 1, 1], ['t&#225;', 'g&#229; sin vei', 1, 1], ['(wi) gb&#225;n', 'hoppe', 1, 1], ['n&#225;', 'komme', 1, 1], ['lani &#626;e', 'ligge', 1, 1], ['bwe', 'l&#248;pe', 1, 1], ['sini &#626;e', 'sitte', 1, 1], ['(wi) l&#596;', 'stoppe', 1, 1], ['l&#596;&#596;ni &#626;e', 'st&#229;, stille seg', 1, 1], ['s&#243;', 'hest', 2, 2], ['&#626;akw&#225;n', 'katt', 2, 2], ['ninsi', 'ku', 2, 2], ['saa', 's&#248;ye', 2, 2], ['t&#596;&#769;ng&#596;n', 'and', 2, 2], ['kw&#596;&#769;shaf&#603;', 'bak', 5, 2], ['kw&#596;man', 'bak', 5, 2], ['&#626;&#237;nzhaf&#603;', 'foran', 5, 2], ['l&#596;', 'oppi', 5, 2], ['k&#596;&#769;nn&#596;n', 'inni', 5, 2], ['s&#233;nv&#603;', 'innunder/ved', 5, 2], ['c&#603;&#769;man', 'mellom', 5, 2], ['dhy&#233;nj&#603;', 'gutt', 2, 3], ['dhy&#233;muso', 'jente', 2, 3], ['muso', 'kvinne', 2, 3], ['c&#603;', 'mann', 2, 3], ['myaan', 'antilope', 2, 4], ['y&#603;&#769;&#603;', 'fisk', 2, 4], ['s&#225;nin (&#331;)', 'hare', 2, 4], ['mbamba', 'krokodille', 2, 4], ['yala', 'l&#248;ve', 2, 4], ['s&#596;&#769; (&#331;)', 'sjiraff', 2, 4], ['gboyonin (&#331;)', 'svin', 2, 4], ['p&#603;&#769;n&#626;en &#242;', 'kamel', 2, 4], ['w&#243;c&#603;&#768;', 'mellom', 5, 4], ['kunn&#596;n', 'over', 5, 4], ['ka', 'p&#229;', 5, 4], ['k&#596;&#596;', 'under', 5, 4], ['t&#596;&#769;f&#603;', 'ved siden av', 5, 4], ['s&#603;&#769;ti', 'asjett', 2, 5], ['s&#237;zo', 'saks', 2, 5], ['fush&#603;ti', 'gaffel', 2, 5], ['mun (&#331;)', 'kniv', 2, 5], ['yafy&#603;', 'kopp/sk&#229;l', 2, 5], ['see', 'kurv', 2, 5], ['kulu', 'skje', 2, 5], ['s&#233;wefa', 'ark', 2, 6], ['kr&#603;&#769;y&#596;n  (&#331;)', 'blyant', 2, 6], ['s&#603;&#769;w&#603; ', 'bok', 2, 6], ['b&#237;ki ', 'penn', 2, 6], ['tabeli ', 'bord', 2, 7], ['fot&#603;yi', 'sofa/lenestol', 2, 7], ['gb&#225;la  (&#331;)', 'seng', 2, 7], ['gb&#225;ni  (&#331;)', 'stol', 2, 7], ['di', 'gi', 1, 8], ['bya', 'legge', 1, 8], ['bho sula', 'peke', 1, 8], ['ta', 'ta', 1, 8], ['dhyem&#250;', 'appelsin', 2, 9], ['kw&#603;s&#603;', 'aubergine', 2, 9], ['b&#250;lu', 'br&#248;d', 2, 9], ['yawa', 'l&#248;k', 2, 9], ['dhyemukun (&#331;)', 'sitron', 2, 9], ['t&#225;sa &#243;lu', 'gryter og boller?', 2, 10], ['sengawa', 'b&#229;l', 2, 10], ['f&#250;lun&#603;&#603;n', 'grill', 2, 10], ['gb&#250;turu', 'gryte', 2, 10], ['la', 'rund gryte', 2, 10], ['t&#225;sa', 'gryte', 2, 10], ['l&#225;tunan', 'grytelokk', 2, 10], ['s&#233; la', 'kaffekjele', 2, 10], ['k&#243;  (&#331;)', 'morter', 2, 10], ['koman  (&#331;)', 'morterpinne', 2, 10], ['f&#225;nin  (&#331;)', 'rund panne', 2, 10], ['bh&#243; ng&#596;manla', 'vegg', 2, 11], ['m&#596;nd&#596;l&#596;', 'klokke', 2, 11], ['l&#225;', 'd&#248;r&#229;pning', 2, 11], ['z&#243;  (&#331;)', 'hj&#248;rne', 2, 11], ['t&#225;blo', 'tavle', 2, 11], ['lu man', 'gulv', 2, 11], ['pl&#225;f&#596;n (&#331;)', 'tak', 2, 11], ['finnant&#603;li', 'vindu', 2, 11], ['y&#225;a', 'bilde', 2, 11], ['bhak&#596;nin &#331;o', 'geit', 2, 12], ['l&#243;nan &#331;o', 'hane', 2, 12], ['dim&#596;nnin &#331;o', 'honningbie', 2, 12], ['sh&#237;sh&#603;', 'h&#248;ne', 2, 12], ['&#626;&#596;&#769;nm&#603;n', 'kamel', 2, 12], ['b&#225;sa', 'firfirsle', 2, 12], ['b&#225;sakrengbe', 'firfirslehann', 2, 12], ['san o', 'slange', 2, 12], ['w&#225;ra', 'tiger', 2, 12], ['k&#233;e &#331;', '1', 4, 13], ['fyaa', '2', 4, 13], ['s&#225;aw&#224; (sawa)', '3', 4, 13], ['n&#225;ni', '4', 4, 13], ['l&#243;', '5', 4, 13], ['k&#603;nm&#603;n', '100', 4, 13], ['mw&#225;a', '20', 4, 13], ['b&#237; sawa', '30', 4, 13], ['w&#225; (k&#233;)', '1000', 4, 13], ['w&#596;&#769;r&#596;', '6', 4, 13], ['wonvya', '7', 4, 13], ['s&#603;&#769;&#626;i', '8', 4, 13], ['k&#596;nd&#596;', '9', 4, 13], ['t&#225;', '10', 4, 13], ['fw&#233;yi', '0', 4, 13], ['k&#225;binan', 'do', 2, 14], ['lwadhye (&#331;)', 'speil', 2, 14], ['see &#243;', 'kurv', 2, 14], ['t&#225;kako', 'fyrstikk', 2, 14], ['bh&#243; &#331;&#243;', 'hus', 2, 14], ['sh&#225; (&#331;)', 'kost', 2, 14], ['&#626;anman &#243;', 's&#248;ppel', 2, 14], ['f&#233;e', 'blomst', 2, 14], ['y&#237;ri ', 'tre', 2, 14], ['yese', 'tr&#229;d', 2, 14], ['bh&#243;o t&#250; l&#225;', 'ber&#248;re', 1, 15], ['bh&#243;o my&#225;n l&#225;', 'gripe', 1, 15], ['ka k&#603; min nan', 'bruke noe', 1, 15], ['t&#225;sa l&#596;&#769; kw&#243;', 'vaske opp', 1, 15], ['t&#225;l&#232;', 'b&#230;re', 1, 15], ['lafii', 'kaste', 1, 15], ['bh&#243;o gbasi a man', 'klappe noen', 1, 15], ['bh&#243;o tinmin a man', 'sktryke noen', 1, 15], ['lawi', 'l&#248;fte', 1, 15], ['by&#603;&#769;man', 'besteforelder, kvinnes svigerfar', 2, 16], ['mwan', 'bestemor', 2, 16], ['f&#225;c&#603;', 'far', 2, 16], ['woba fitini (&#331;)', 'fars kone (ikke mor)', 2, 16], ['b&#225;dhye (&#331;)', 'hels&#248;sken', 2, 16], ['fadhye (&#331;)', 'halvs&#248;sken', 2, 16], ['l&#596;&#769;c&#603;', 'lillebror', 2, 16], ['l&#596;&#769;muso', 'lilles&#248;ster', 2, 16], ['m&#596;&#769;n &#243;lu', 'familie', 2, 16], ['w&#243;ba', 'mor', 2, 16], ['k&#596;c&#603;', 'storebror', 2, 16], ['k&#596;muso', 'stores&#248;ster', 2, 16], ['manmuso', 'kvinnes svigermor', 2, 16], ['by&#225;muso', 'manns svigermor', 2, 16], ['by&#225;nj&#603;', 'manns svigerfar', 2, 16], ['bh&#243;o', 'h&#229;nd', 2, 17], ['&#626;&#225;nfy&#603;', 'ansikt', 2, 17], ['l&#225;ku', 'hake', 2, 17], ['kunnzhe', 'hodeh&#229;r', 2, 17], ['sh&#233;', 'h&#229;r, pels', 2, 17], ['l&#243;o', 'kinn', 2, 17], ['kam&#603;', 'kinnbein', 2, 17], ['l&#225;', 'munn', 2, 17], ['n&#250;n (&#331;)', 'nese', 2, 17], ['&#626;andhye (&#331;)', 'pupill', 2, 17], ['c&#233; (&#331;)', 'panne', 2, 17], ['&#626;&#237;nngo', 'tann(bein)', 2, 17], ['&#626;&#603;&#769;n (&#331;)', 'tunge', 2, 17], ['t&#243;', '&#248;re', 2, 17], ['t&#243;fa', '&#248;re', 2, 17], ['&#626;&#225;nkonganzhe', '&#248;yenbryn', 2, 17], ['&#626;anshe', '&#248;yevipper', 2, 17], ['t&#596;&#769;', 'bakhode', 2, 18], ['n&#250;nngba (&#331;)', 'nese, snute, snabel', 2, 18], ['bh&#243;oka', 'arm', 2, 18], ['s&#237;si', 'bryst', 2, 18], ['bh&#243;okw&#603;nnin (&#331;)', 'finger', 2, 18], ['faa', 'skall, skjell', 2, 18], ['senva', 'fotbak', 2, 18], ['send&#603;&#603;', 'fots&#229;le', 2, 18], ['kw&#243;', 'hale', 2, 18], ['sengu', 'h&#230;l', 2, 18], ['k&#225;n (&#331;)', 'hals', 2, 18], ['kun (&#331;)', 'hode', 2, 18], ['g&#233;e', 'horn', 2, 18], ['t&#596;&#769;l&#596; (&#331;)', 'hov, klov', 2, 18], ['bh&#243;okw&#596;', 'h&#229;ndbak', 2, 18], ['t&#603;&#769;&#603;', 'h&#229;ndflate', 2, 18], ['bh&#243;oku', 'albue', 2, 18], ['sw&#603;&#769;n (&#331;)', 'kl&#248;r', 2, 18], ['k&#250;nm&#603;n (&#331;)', 'kne', 2, 18], ['fasi', 'kropp', 2, 18], ['gb&#603;&#769;&#603; (&#331;)', 'legg', 2, 18], ['solala', 'liv, beltested', 2, 18], ['w&#243;ro', 'l&#229;r', 2, 18], ['k&#596;&#769;n', 'mage', 2, 18], ['l&#225;gba (&#331;)', 'nebb', 2, 18], ['zukun (&#331;)', 'rumpe', 2, 18], ['kw&#596;&#769;', 'rygg', 2, 18], ['kaw&#225;', 'skulder, vinge', 2, 18], ['se&#769;ngw&#603;nnin (&#331;)', 't&#229;', 2, 18], ['g&#596;&#769;&#596;', 'banan', 2, 19], ['k&#225;r&#596;ti', 'gulrot', 2, 19], ['su', 'k&#229;l', 2, 19], ['s&#225;ladi', 'salat', 2, 19], ['b&#596;nb&#596;n', 'snop', 2, 19], ['t&#225;nmanti', 'tomat', 2, 19], ['t&#603;&#769;&#603;n', 'mandag', 2, 20], ['t&#225;a', 'tirsdag', 2, 20], ['&#225;wa', 'onsdag', 2, 20], ['m&#237;sa', 'torsdag', 2, 20], ['j&#237;man', 'fredag', 2, 20], ['s&#237;wi', 'l&#248;rdag', 2, 20], ['k&#243;k&#596;', 's&#248;ndag', 2, 20], ['k&#603;&#769;la', 'helle', 1, 21], ['kin (&#331;)', 'bite', 1, 21], ['si la taman', 'koke noe', 1, 21], ['t&#603;&#769;', 'skj&#230;re', 1, 21], ['l&#596;&#769;min k&#603;&#769;', 'spise', 1, 21], ['lakunnan', 'svelge', 1, 21], ['gbak&#603;', 'tilberede', 1, 21], ['i s&#603;&#769;&#603;', 'be', 1, 21], ['yala', 'vise', 1, 21], ['mank&#596;n (&#331;)', 'vente', 1, 21]]
+
+var ordlisteLengde = ordliste.length
+
+// Hjem
+function hjem() {
+	document.getElementById("overskrift").innerHTML = "<h2>Velkommen!</h2>";	
+	document.getElementById("innhold").innerHTML = "<p>Vennligst velg en metode for glosepugging.</p><p><b>Kort om de forskjellige funksjonene:</b><br><i>Quiz</i> genererer en multiple-choice-test av de glosene du velger. Du kan enten velge en ferdig liste med ett klikk, eller sette sammen ditt eget utvalg av ord basert p&aring; leksjon og ordklasser og velge hvor mange oppgaver og alternativer som skal generereres.</p><p>De to andre funksjonene er laget med utgangspunkt i hvordan man kan bruke flashcards. Det gis ingen alternativer, og du vurderer selv om du har greid oppgaven eller ikke. Programmet holder styr p&aring; kortene for deg, og s&oslash;rger for en riktig progresjon. Begge disse funksjonene krever at browseren din st&oslash;tter s&aring;kalt Web storage, som kan huske hvor langt du har kommet.</p><p><i>Poeng</i> bruker et poengsystem, hvor hvert enkelt ord har en poengsum som starter p&aring; 50. N&aring;r du svarer feil mister du 15 poeng, n&aring;r du svarer rett f&aring;r du 10 poeng, og hvis du oppgir at du ikke vet svaret mister du 5 poeng. N&aring;r et ord har n&aring;dd 100 poeng tas det ut av &oslash;vingene, men det kan n&aring;r som helst dukke opp igjen som en tilfeldig repetisjon. N&aring;r du starter denne funksjonen settes det sammen en &oslash;kt best&aring;ende av 30 ord. Denne funksjonen egner seg godt til &aring; brukes over lengre tid, en gang eller to om dagen.</p><p><i>Tid</i> egner seg bedre til intensiv glosepugging. Du kan se for deg at glosekortene ligger i opp til 11 forskjellige bunker. I den f&oslash;rste bunken m&aring; de ligge i minst fem sekunder f&oslash;r du ser dem igjen, i den neste i 25 sekunder, i den neste i to minutter, og s&aring; videre, helt opp til den siste bunken hvor de ikke repeteres f&oslash;r om to &aring;r. Hver gang man svarer riktig flyttes kortet videre til neste bunke, men dersom man svarer feil g&aring;r kortet tilbake til f&oslash;rste bunke. N&aring;r ingen kort er klare til repetisjon, tar man et nytt kort fra boksen, ser p&aring; det, og legger det i f&oslash;rste bunke. Denne metoden sikrer at glosene m&aring; huskes en viss tid f&oslash;r programmet regner med at du kan dem. Dersom man bruker funksjonen <i>Poeng</i> veldig hyppig, vil en glose kunne oppn&aring; 100 poeng p&aring; noen timer, uten at man husker den neste dag. Hvis man derimot bruker <i>Tid</i> mye, vil tidsintervallene v&aelig;re faste, og man vil heller jobbe med flere ord samtidig.</p>";
+}
+
+// Generelle funksjoner
+function tilfeldigeUlike(utvalgslista,lengden){
+	var x=Math.floor(Math.random()*utvalgslista.length);
+	if (lengden>1){
+		var listeutentilfeldig=[];
+		for (var y = 0; y<utvalgslista.length; y++){
+			if (y!=x){
+			listeutentilfeldig.push(utvalgslista[y]);
+			}
+		}
+		var restenavlista=tilfeldigeUlike(listeutentilfeldig,lengden-1);
+		restenavlista.push(utvalgslista[x]);
+		return restenavlista;
+	}
+	else {
+		return [utvalgslista[x]];
+	}
+}
+
+function velgOptionMedVerdi(element,verdi){
+	for (var i=0; i < element.options.length; i++){
+		if(element.options[i].value == verdi){
+        	element.selectedIndex = i;
+        }
+    }
+}
+
+// Glosequiz
+function glosequizSetup() {
+
+	//Deaktiver eventuelle snarveier
+	document.removeEventListener('keypress', visGloseSnarveier);
+	
+	document.getElementById("overskrift").innerHTML = "<h2>Glosequiz</h2>";
+	document.getElementById("innhold").innerHTML = "<div class=\"halv\">\
+	<p><b>Lister:</b></p>\
+	<button type=\"button\" onclick=\"glosequizStarter(1,1,1,1,1,1,1,1,1,1,5,0,0);\">Liste 1</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(2,2,1,1,1,1,1,1,1,1,5,0,0);\">Liste 2</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(3,3,1,1,1,1,1,1,1,1,5,0,0);\">Liste 3</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(4,4,1,1,1,1,1,1,1,1,5,0,0);\">Liste 4</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(5,5,1,1,1,1,1,1,1,1,5,0,0);\">Liste 5</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(6,6,1,1,1,1,1,1,1,1,5,0,0);\">Liste 6</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(7,7,1,1,1,1,1,1,1,1,5,0,0);\">Liste 7</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(8,8,1,1,1,1,1,1,1,1,5,0,0);\">Liste 8</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(9,9,1,1,1,1,1,1,1,1,5,0,0);\">Liste 9</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(10,10,1,1,1,1,1,1,1,1,5,0,0);\">Liste 10</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(11,11,1,1,1,1,1,1,1,1,5,0,0);\">Liste 11</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(12,12,1,1,1,1,1,1,1,1,5,0,0);\">Liste 12</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(13,13,1,1,1,1,1,1,1,1,5,0,0);\">Liste 13</button>\
+	<button type=\"button\" onclick=\"glosequizStarter(14,14,1,1,1,1,1,1,1,1,5,0,0);\">Liste 14</button>\
+	<p> Det gis 5 alternativer pr sp&oslash;rsm&aring;l<br>Oversettelse: Latin til norsk<br>Alle ord i listen testes\
+	</p>\
+	</div>\
+	<div class=\"resten\">\
+	<p><b>Avansert:</b><form oninput=\"antallpreview();\">\
+	Ord som forekommer fra leksjon<input type=\"number\" id=\"frainput\" min=1 max=14 value=1>\
+	til<input type=\"number\" id=\"tilinput\" min=1 max=114 value=14>, \
+	inkludert ordklassene:<br>\
+	<input type=\"checkbox\" id=\"verbinput\" checked onclick=\"antallpreview()\">Verb<br>\
+	<input type=\"checkbox\" id=\"subsinput\" checked onclick=\"antallpreview()\">Substantiver<br>\
+	<input type=\"checkbox\" id=\"adjinput\" checked onclick=\"antallpreview()\">Adjektiver<br>\
+	<input type=\"checkbox\" id=\"proninput\" checked onclick=\"antallpreview()\">Pronomen<br>\
+	<input type=\"checkbox\" id=\"tallinput\" checked onclick=\"antallpreview()\">Tallord<br>\
+	<input type=\"checkbox\" id=\"prepinput\" checked onclick=\"antallpreview()\">Preposisjoner<br>\
+	<input type=\"checkbox\" id=\"konjinput\" checked onclick=\"antallpreview()\">Konjunksjoner<br>\
+	<input type=\"checkbox\" id=\"advinput\" checked onclick=\"antallpreview()\">Adverb<br>\
+	<br>(<b><span id=\"forelopigeord\">0</span></b> ord kjenner seg truffet.)<br><br>\
+	<select id=\"antallalternativer\">\
+	<option value=3>3</option>\
+	<option value=5 selected>5</option>\
+	<option value=10>10</option>\
+	</select> alternativer pr sp&oslash;rsm&aring;l<br>\
+	<select id=\"reversretning\">\
+	<option value=0>Latin-norsk</option>\
+	<option value=1>Norsk-latin</option>\
+	</select><br>\
+	<select id=\"antallsporsmal\">\
+	<option value=10>Maks 10</option>\
+	<option value=20 selected>Maks 20</option>\
+	<option value=50 selected>Maks 50</option>\
+	<option value=0>Alle</option>\
+	</select> oppgaver<br><br>\
+	</form>\
+	<button type=\"button\" id=\"kjorquiz\" onclick=\"innholdssjekk()\">Kj&oslash;r!</button></p>\
+	</div>\
+	<br style=\"clear: left;\" />";
+	antallpreview();
+}
+
+function innholdssjekk (){
+	if (document.getElementById("forelopigeord").innerHTML == "0"){
+		window.alert("Det er ingen ord i gjeldende utvalg");
+	}
+	else {
+		glosequizStarter(document.getElementById("frainput").value,document.getElementById("tilinput").value,document.getElementById("verbinput").checked,document.getElementById("subsinput").checked,document.getElementById("proninput").checked,document.getElementById("tallinput").checked,document.getElementById("prepinput").checked,document.getElementById("adjinput").checked,document.getElementById("advinput").checked,document.getElementById("konjinput").checked,document.getElementById("antallalternativer").value,document.getElementById("reversretning").value,document.getElementById("antallsporsmal").value);
+	}
+}
+
+function antallpreview (){
+	var telling=0;
+	var x=-1;
+	var i=0;
+	var til=parseInt(document.getElementById("tilinput").value);
+	var fra=parseInt(document.getElementById("frainput").value);
+
+	if (isNaN(til)){
+		til=1
+	}
+	if (isNaN(fra)){
+		fra=1
+	}
+	if (fra<1){
+		fra=1;
+	}
+	if (til<1){
+		til=1;
+	}
+
+	if (fra<til){
+		var midlertidig=til;
+		til=fra;
+		fra=midlertidig;
+	}
+
+	//Definer et startpunkt, x, ved aa telle ovenfra
+	while (x==-1 && i<ordliste.length){
+		if (ordliste[i][3]>=til){
+			x=i;
+		}
+		i+=1;
+	}
+	var sjekkliste=[];
+	if (document.getElementById("verbinput").checked){
+		sjekkliste.push(1);
+	}
+	if (document.getElementById("subsinput").checked){
+		sjekkliste.push(2);
+	}
+	if (document.getElementById("proninput").checked){
+		sjekkliste.push(3);
+	}
+	if (document.getElementById("tallinput").checked){
+		sjekkliste.push(4);
+	}
+	if (document.getElementById("prepinput").checked){
+		sjekkliste.push(5);
+	}
+	if (document.getElementById("adjinput").checked){
+		sjekkliste.push(6);
+	}
+	if (document.getElementById("advinput").checked){
+		sjekkliste.push(7);
+	}
+	if (document.getElementById("konjinput").checked){
+		sjekkliste.push(8);
+	}
+	
+	//Sjekk alle ord fra x nedover til fra-grense
+	while (ordliste[x][3]<=fra){
+		
+		if (sjekkliste.indexOf(ordliste[x][2])!==-1){
+			telling+=1;
+		}
+		x +=1;
+		//console.log([x,ordliste[x],ordliste[x][3],ordliste[x][3]>=fra]);
+	}
+	document.getElementById("forelopigeord").innerHTML =  telling;
+}
+
+function glosequizStarter (raw_fra,raw_til,vb,subs,pron,tall,prep,adj,adv,konj,alt,rev,opg) {
+
+	//Sett globale innstillinger
+	revers=rev;
+	alternativer=alt;
+	poengsum = 0;
+
+	//Soerg for at til er stoerre enn fra, og at fra ikke er for liten
+	var til=parseInt(raw_til);
+	var fra=parseInt(raw_fra);
+	if (isNaN(til)){
+		til=1
+	}
+	if (isNaN(fra)){
+		fra=1
+	}
+	if (fra<1){
+		fra=1;
+	}
+	if (til<1){
+		til=1;
+	}
+	if (fra<til){
+		var midlertidig=til;
+		til=fra;
+		fra=midlertidig;
+	}
+	
+	//Finn starten paa utvalget
+	var x=-1;
+	var i=0;
+	while (x==-1){
+		if (ordliste[i][3]>=til){
+			x=i;
+		}
+		i+=1;
+	}
+	
+	//Definer hvilke ordklasseverdier (ordliste[x][2]) som er gyldige
+	var sjekkliste=[];
+	if (vb==1){
+		sjekkliste.push(1);
+	}
+	if (subs==1){
+		sjekkliste.push(2);
+	}
+	if (pron==1){
+		sjekkliste.push(3);
+	}
+	if (tall==1){
+		sjekkliste.push(4);
+	}
+	if (prep==1){
+		sjekkliste.push(5);
+	}
+	if (konj==1){
+		sjekkliste.push(6);
+	}
+	if (adv==1){
+		sjekkliste.push(7);
+	}
+	if (adj==1){
+		sjekkliste.push(8);
+	}
+
+	
+	//Kopier ord fra global ordliste til globalt utvalg
+	utvalg=[];
+	while (ordliste[x][3]<=fra){
+		if (sjekkliste.indexOf(ordliste[x][2])!==-1){
+			utvalg.push(ordliste[x]);
+		}
+		x +=1;
+	}
+	if (alternativer>utvalg.length){
+		alternativer=utvalg.length;
+	}
+	if (opg>utvalg.length){
+		opg=utvalg.length;
+	}
+	else if (opg==0){
+		opg=utvalg.length;
+	}
+	
+	//Generer global rekkefoelge for oppgaver
+	var tallListe=[];
+	var y=0;
+	while (y<utvalg.length){
+		tallListe.push(y);
+		y += 1;
+	}
+	tilfeldigTallListe = tilfeldigeUlike(tallListe,opg);
+	progresjon=0;
+	poengsum=0;
+
+	//Sett i gang foerste oppgave
+	glosequizNeste(0);
+}
+
+function glosequizNeste(poeng) {
+	
+	//Rydd
+	document.getElementById("innhold").innerHTML = "";
+	
+	//Oppdater poeng
+	poengsum = poengsum + poeng;
+	
+	//Finn gjeldende ord
+	var ordet = utvalg[tilfeldigTallListe[progresjon]][revers];
+	
+	//Generer gale alternativer
+	var tallListe=[];
+	var y=0;
+	while (y<utvalg.length){
+		if (y!=tilfeldigTallListe[progresjon]){
+			tallListe.push(y);
+		}
+		y+=1;
+	}
+	var galeAlternativer = tilfeldigeUlike(tallListe,alternativer-1);
+	
+	//Bygg opp teksten
+	var tekst=" ";
+	
+	//Tilbakemelding fra forrige spoersmaal
+	if (progresjon!=0){
+		if (poeng){
+			tekst+="<span class=\"riktig\">Riktig!</span><br>";
+		}
+		else {
+			tekst+="<span class=\"feil\">Feil! \""+utvalg[tilfeldigTallListe[progresjon-1]][revers]+"\" betyr &quot;"+utvalg[tilfeldigTallListe[progresjon-1]][1-revers]+"&quot;</span><br>";
+		}
+		tekst+="Du har "+poengsum+"/"+progresjon+" rette svar.<br><br>";
+	}
+	else {
+	tekst += "<br><br><br>";
+	}
+	
+	//Spoersmaal
+	tekst+="<span class=\"sporsmal\">Hva betyr <span class=\"glose\">&quot;"+ordet+"&quot;</span>?</span><br><br>";
+	
+	//Alternativer
+	var x=Math.floor(Math.random()*alternativer); //Tilfeldig plassering av rett alternativ
+	if (progresjon<tilfeldigTallListe.length-1){
+		for (var i = 0; i<alternativer; i++){
+			if (i==x){
+				tekst+="<button class=\"alternativ\" type=\"button\" onclick=\"glosequizNeste(1)\">"+utvalg[tilfeldigTallListe[progresjon]][1-revers]+"</button><br>";
+			}
+			else {
+				if (i<x){
+					tekst+="<button class=\"alternativ\" type=\"button\" onclick=\"glosequizNeste(0)\">"+utvalg[galeAlternativer[i]][1-revers]+"</button><br>";		
+				}
+				else {
+					tekst+="<button class=\"alternativ\" type=\"button\" onclick=\"glosequizNeste(0)\">"+utvalg[galeAlternativer[i-1]][1-revers]+"</button><br>";		
+				}
+			}
+		}
+	}
+	else {
+		for (i = 0; i<alternativer; i++){
+			if (i==x){
+				tekst+="<button class=\"alternativ\" type=\"button\" onclick=\"glosequizSlutt(1)\">"+utvalg[tilfeldigTallListe[progresjon]][1-revers]+"</button><br>";
+			}
+			else {
+				if (i<x){
+					tekst+="<button class=\"alternativ\" type=\"button\" onclick=\"glosequizSlutt(0)\">"+utvalg[galeAlternativer[i]][1-revers]+"</button><br>";		
+				}
+				else {
+					tekst+="<button class=\"alternativ\" type=\"button\" onclick=\"glosequizSlutt(0)\">"+utvalg[galeAlternativer[i-1]][1-revers]+"</button><br>";		
+				}
+			}
+		}
+	}
+	
+	
+	progresjon+=1;
+	document.getElementById("innhold").innerHTML = tekst;
+	
+}
+
+function glosequizSlutt(poeng) {
+	
+	//Rydd
+	document.getElementById("innhold").innerHTML = "";
+	
+	//Oppdater poeng
+	poengsum = poengsum + poeng;
+
+	//Bygg opp teksten
+	var tekst=" ";
+	
+	//Tilbakemelding fra forrige spoersmaal
+	if (poeng){
+		tekst+="<span class=\"riktig\">Riktig!</span><br>";
+	}
+	else {
+		tekst+="<span class=\"feil\">Feil! Rett svar er &quot;"+utvalg[tilfeldigTallListe[progresjon-1]][1-revers]+"&quot;</span><br>";
+	}
+	tekst+="Du fikk i alt "+poengsum+"/"+progresjon+" rette svar.<br><br>";
+
+
+	tekst += "<button type=\"button\" onclick=\"glosequizRestart()\">Om igjen!</button><br>";
+	tekst += "<button type=\"button\" onclick=\"glosequizSetup()\">Ny glosequiz</button><br>";
+	tekst += "<button type=\"button\" onclick=\"hjem()\">Avslutt</button><br>";
+
+	progresjon=0;
+	poengsum=0;
+	document.getElementById("innhold").innerHTML = tekst;	
+}
+
+function glosequizRestart () {
+
+	//Generer ny global rekkefoelge for oppgaver
+	var tallListe=[];
+	var y=0;
+	while (y<utvalg.length){
+		tallListe.push(y);
+		y += 1;
+	}
+	tilfeldigTallListe = tilfeldigeUlike(tallListe,tilfeldigTallListe.length);
+	
+	
+	glosequizNeste(0);
+}
+
+// Glosetrening
+function glosetreningSetup() {
+
+	//Deaktiver eventuelle snarveier
+	document.removeEventListener('keypress', visGloseSnarveier);
+	
+	document.getElementById("overskrift").innerHTML = "<h2>Poeng</h2>";
+	document.getElementById("innhold").innerHTML = "";
+	// Check browser support
+	if (typeof(Storage) !== "undefined") {
+		// Hvis funksjonen ikke er brukt foer, setter vi innstillingene til normal
+		if (!(localStorage.lat2GlosetreningLagret)){
+			localStorage.lat2GlosetreningLagret=JSON.stringify([30,10]);
+		}
+		glosetreningMidlertidig = JSON.parse(localStorage.lat2GlosetreningLagret);
+		
+		//finn ut hvilke gamle ord som kan vaere med
+		var gamleOrdPlasseringer = [];
+		
+		for (var x=innstillinger; x<glosetreningMidlertidig.length; x++) {
+			if (glosetreningMidlertidig[x]==100) {
+				gamleOrdPlasseringer.push(x-innstillinger);
+			}
+		}
+		
+		var antallGamleOrd = glosetreningMidlertidig[1];
+		if (glosetreningMidlertidig[1] > gamleOrdPlasseringer.length) {
+			antallGamleOrd = gamleOrdPlasseringer.length;
+		}
+		
+		//finn ut hvilke av de gamle ordene som faktisk blir med
+		var ordPlasseringer = [];
+		if (antallGamleOrd > 0) {
+			ordPlasseringer = tilfeldigeUlike(gamleOrdPlasseringer,antallGamleOrd);
+		}
+		
+		//fyll opp resten av plassen med nye ord
+		var y = innstillinger;
+		while (ordPlasseringer.length < glosetreningMidlertidig[0] && ordliste[y-2][3] != 0) {
+			if (y >= glosetreningMidlertidig.length) {
+				ordPlasseringer.push(y-innstillinger);
+				glosetreningMidlertidig.push(50);
+			} else if (glosetreningMidlertidig[y] < 100) {
+				ordPlasseringer.push(y-innstillinger);
+			}
+			y += 1;
+		}
+		
+		//lagre resultatet globalt
+		utvalg = ordPlasseringer;
+		
+		//lag tilfeldig rekkefoelge globalt
+		var tallListe=[];
+		var y=0;
+		while (y<utvalg.length){
+			tallListe.push(y);
+			y += 1;
+		}
+		tilfeldigTallListe = tilfeldigeUlike(tallListe,tallListe.length);
+		
+		//sett opp skallet
+		document.getElementById("innhold").innerHTML = "<p>\
+		Leksjon: <span id=\"treningFrekvens\">0</span>\
+		<span class=\"hoyre\">Score: <span id=\"treningScore\">0</span></span></p>\
+		<div id=\"treningFlashcard\"><div id=\"treningGlose\">Glose</div></div>\
+		<div id=\"treningKnapper\"><br>\
+		<button type=\"button\" id=\"treningVenstre\">Klar</button>\
+		<button type=\"button\" id=\"treningHoyre\">Vet ikke</button><br><br>\
+		<button type=\"button\" id=\"treningUnder\">Full kontroll!</button></div>\
+		<p>Ord igjen: <span id=\"treningIgjen\">0</span>\
+		<button type=\"button\" id=\"treningInnstillinger\">Innstillinger/Hjelp</button>"
+		
+		document.getElementById("treningInnstillinger").onclick = gloseTreningInnstillinger;
+		
+		//nullstill progresjon
+		progresjon = 0;
+		ordTilRep = [];
+		
+		gloseTreningGlose();
+
+	} else {
+    	document.getElementById("innhold").innerHTML = "Sorry, browseren din st&oslash;tter ikke web storage. Og da blir denne funksjonen litt ubrukelig...";
+	}
+}
+
+function gloseTreningGlose() {
+	
+	if (progresjon == utvalg.length) {
+		gloseTreningSlutt();
+	} else {
+	
+		//Sett opp tekst
+		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
+		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningVenstre").innerHTML = "Klar";
+		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
+		document.getElementById("treningUnder").innerHTML = "Full kontroll";
+		document.getElementById("treningIgjen").innerHTML = utvalg.length-progresjon-1;
+	
+		//Gi knappene sine funksjoner
+		document.getElementById("treningVenstre").onclick = gloseTreningKlar;
+		document.getElementById("treningVenstre").disabled = false;
+		document.getElementById("treningHoyre").onclick = gloseTreningVetIkke;
+		document.getElementById("treningUnder").onclick = gloseTreningKontroll;
+		document.getElementById("treningUnder").disabled = false;
+		
+		
+	}
+}
+
+function gloseTreningKlar() {
+
+	//Sett opp tekst
+	document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
+	document.getElementById("treningVenstre").innerHTML = "Riktig";
+	document.getElementById("treningHoyre").innerHTML = "Galt";
+
+	//Gi knappene sine funksjoner
+	document.getElementById("treningVenstre").onclick = gloseTreningGloseRiktig;
+	document.getElementById("treningHoyre").onclick = gloseTreningGloseGalt;
+	document.getElementById("treningUnder").onclick = gloseTreningKontroll;
+	
+
+}
+
+function gloseTreningVetIkke() {
+	
+	glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]=glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]-5;
+	if (glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]<0){
+		glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger] = 0;
+	}
+	localStorage.lat2GlosetreningLagret=JSON.stringify(glosetreningMidlertidig);
+	ordTilRep.push(utvalg[tilfeldigTallListe[progresjon]]);
+	
+	//Sett opp tekst
+	document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
+	document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][1];
+	document.getElementById("treningVenstre").innerHTML = "---";
+	document.getElementById("treningHoyre").innerHTML = "Fortsett";
+	document.getElementById("treningUnder").innerHTML = "---";
+	document.getElementById("treningIgjen").innerHTML = utvalg.length-progresjon-1;
+
+	//Gi knappene sine funksjoner
+	document.getElementById("treningVenstre").onclick = 0;
+	document.getElementById("treningVenstre").disabled = true;
+	document.getElementById("treningHoyre").onclick = gloseTreningGlose;
+	document.getElementById("treningUnder").onclick = 0;
+	document.getElementById("treningUnder").disabled = true;
+	
+	//Komme seg videre
+	progresjon += 1;
+	
+}
+
+function gloseTreningKontroll() {
+	
+	glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]=glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]+100;
+	if (glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]>100){
+		glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger] = 100;
+	}
+	localStorage.lat2GlosetreningLagret=JSON.stringify(glosetreningMidlertidig);
+	
+	progresjon += 1;
+	
+	if (progresjon == utvalg.length) {
+		gloseTreningSlutt();
+	} else {
+	
+		//Sett opp tekst
+		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
+		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningVenstre").innerHTML = "Klar";
+		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
+		document.getElementById("treningUnder").innerHTML = "Full kontroll";
+		document.getElementById("treningIgjen").innerHTML = utvalg.length-progresjon-1;
+
+		//Gi knappene sine funksjoner
+		document.getElementById("treningVenstre").onclick = gloseTreningKlar;
+		document.getElementById("treningHoyre").onclick = gloseTreningVetIkke;
+		document.getElementById("treningUnder").onclick = gloseTreningKontroll;
+		
+	}
+}
+
+function gloseTreningGloseGalt() {
+	
+	glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]=glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]-15;
+	if (glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]<0){
+		glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger] = 0;
+	}
+	localStorage.lat2GlosetreningLagret=JSON.stringify(glosetreningMidlertidig);
+	ordTilRep.push(utvalg[tilfeldigTallListe[progresjon]]);
+	
+	progresjon += 1;
+	
+	if (progresjon == utvalg.length) {
+		gloseTreningSlutt();
+	} else {
+	
+		//Sett opp tekst
+		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
+		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningVenstre").innerHTML = "Klar";
+		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
+		document.getElementById("treningUnder").innerHTML = "Full kontroll";
+		document.getElementById("treningIgjen").innerHTML = utvalg.length-progresjon-1;
+	
+		//Gi knappene sine funksjoner
+		document.getElementById("treningVenstre").onclick = gloseTreningKlar;
+		document.getElementById("treningHoyre").onclick = gloseTreningVetIkke;
+		document.getElementById("treningUnder").onclick = gloseTreningKontroll;
+		
+	}
+}
+
+function gloseTreningGloseRiktig() {
+	
+	glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]=glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]+10;
+	if (glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger]>100){
+		glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger] = 100;
+	}
+	localStorage.lat2GlosetreningLagret=JSON.stringify(glosetreningMidlertidig);
+	
+	progresjon += 1;
+
+	if (progresjon == utvalg.length) {
+		gloseTreningSlutt();
+	} else {
+	
+		//Sett opp tekst
+		document.getElementById("treningFrekvens").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][3];
+		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[utvalg[tilfeldigTallListe[progresjon]]+innstillinger];
+		document.getElementById("treningGlose").innerHTML = ordliste[utvalg[tilfeldigTallListe[progresjon]]][0];
+		document.getElementById("treningVenstre").innerHTML = "Klar";
+		document.getElementById("treningHoyre").innerHTML = "Vet ikke";
+		document.getElementById("treningUnder").innerHTML = "Full kontroll";
+		document.getElementById("treningIgjen").innerHTML = utvalg.length-progresjon-1;
+	
+		//Gi knappene sine funksjoner
+		document.getElementById("treningVenstre").onclick = gloseTreningKlar;
+		document.getElementById("treningHoyre").onclick = gloseTreningVetIkke;
+		document.getElementById("treningUnder").onclick = gloseTreningKontroll;
+		
+	}
+}
+
+function gloseTreningSlutt () {
+	progresjon = 0;
+	utvalg = [];
+	if (ordTilRep.length != 0){
+		if (confirm('Vil du se gjennom de vanskelige ordene igjen?')) {
+    		gloseTreningRepGlose();
+		} else {
+			ordTilRep = [];
+    		hjem();
+		}
+	} else {
+		hjem();
+	}
+}
+
+function gloseTreningRepGlose(){
+	
+	if (progresjon == ordTilRep.length) {
+		hjem();
+	} else {
+		//Sett opp tekst
+		document.getElementById("treningFrekvens").innerHTML = ordliste[ordTilRep[progresjon]][3];
+		document.getElementById("treningScore").innerHTML = glosetreningMidlertidig[ordTilRep[progresjon]+innstillinger];
+		document.getElementById("treningGlose").innerHTML = ordliste[ordTilRep[progresjon]][0];
+		document.getElementById("treningVenstre").innerHTML = "---";
+		document.getElementById("treningHoyre").innerHTML = "Fortsett";
+		document.getElementById("treningUnder").innerHTML = "---";
+		document.getElementById("treningIgjen").innerHTML = ordTilRep.length-progresjon-1;
+
+		//Gi knappene sine funksjoner
+		document.getElementById("treningVenstre").onclick = 0;
+		document.getElementById("treningVenstre").disabled = true;
+		document.getElementById("treningHoyre").onclick = gloseTreningRepSvar;
+		document.getElementById("treningUnder").onclick = 0;
+		document.getElementById("treningUnder").disabled = true;
+	}
+}
+
+function gloseTreningRepSvar(){
+
+	//Sett opp tekst
+	document.getElementById("treningGlose").innerHTML = ordliste[ordTilRep[progresjon]][1];
+	
+	//Gi knappene sine funksjoner
+	document.getElementById("treningHoyre").onclick = gloseTreningRepGlose;
+	
+	//Kommer seg videre
+	progresjon += 1;
+}
+
+function gloseTreningInnstillinger(){
+	document.getElementById("innhold").innerHTML = "<p>Glosetrening er utviklet med tanke p&aring; &aring; l&aelig;re ordene p&aring; samme m&aring;te som man ville gjort med glosekort. N&aring;r du &aring;pner Glosetrening setter programmet sammen en samling p&aring; 30 ord som du skal &oslash;ve p&aring;. 10 av disse vil (om mulig) v&aelig;re tilfeldig valgte ord som du allerede kan. De andre ordene velges systematisk slik at du alltid &oslash;ver p&aring; de mest brukte ordene som du ikke har l&aelig;rt enda.</p>\
+	<p>For &aring; ha kontroll p&aring; fremgangen har hvert ord f&aring;tt sin egen poengsum. I utgangspunktet har hvert ord 50 poeng. Hvis du trykker p&aring; &quot;Vet ikke&quot; mister ordet 5 poeng. Hver gang du kjenner igjen ordet f&aring;r det 10 poeng. N&aring;r du tror du kjenner igjen ordet, men tar feil, mister det 15 poeng. N&aring;r et ord har 100 poeng regner porgrammet med at du kan det. (Men det kan n&aring;r som helst dukke opp som en repetisjon.) For at du skal slippe &aring; g&aring; mange ganger gjennom ord du kan godt fra f&oslash;r er det lagt inn en snarvei: &quot;Full-kontroll&quot;-knappen gir et ord 100 poeng umiddelbart.</p>\
+	<p>Innstillinger:<br>\
+	<select id=\"antallordialt\">\
+	<option value=20>20</option>\
+	<option value=30>30</option>\
+	<option value=40>40</option>\
+	</select> ord i alt<br>\
+	<select id=\"antallorddukan\">\
+	<option value=0>0</option>\
+	<option value=5>5</option>\
+	<option value=10>10</option>\
+	<option value=15>15</option>\
+	</select> repetisjonsord<br><br>\
+	<button type=\"button\" onclick=\"lagreinnstillinger()\">Lagre</button>\
+	<button type=\"button\" onclick=\"gloseTreningTilbake()\">Tilbake</button><br><br>\
+	<i><span id=\"bekreftelse\"></span></i></p>";
+	velgOptionMedVerdi (document.getElementById("antallordialt"),glosetreningMidlertidig[0]);
+	velgOptionMedVerdi (document.getElementById("antallorddukan"),glosetreningMidlertidig[1]);
+}
+
+function lagreinnstillinger(){
+	glosetreningMidlertidig[0] = document.getElementById("antallordialt").value;
+	glosetreningMidlertidig[1] = document.getElementById("antallorddukan").value;
+	localStorage.lat2GlosetreningLagret=JSON.stringify(glosetreningMidlertidig);
+	document.getElementById("bekreftelse").innerHTML = "Innstillingene ble lagret. De vil tre i kraft neste gang du starter opp Glosetrening.";
+}
+
+function gloseTreningTilbake(){
+	//sett opp skallet
+	document.getElementById("innhold").innerHTML = "<p>\
+	Frekvens: <span id=\"treningFrekvens\">0</span>\
+	<span class=\"hoyre\">Score: <span id=\"treningScore\">0</span></span></p>\
+	<div id=\"treningFlashcard\"><div id=\"treningGlose\">Glose</div></div>\
+	<div id=\"treningKnapper\"><br>\
+	<button type=\"button\" id=\"treningVenstre\">Klar</button>\
+	<button type=\"button\" id=\"treningHoyre\">Vet ikke</button><br><br>\
+	<button type=\"button\" id=\"treningUnder\">Full kontroll!</button></div>\
+	<p>Ord igjen: <span id=\"treningIgjen\">0</span>\
+	<button type=\"button\" id=\"treningInnstillinger\">Innstillinger/Hjelp</button>"
+	
+	document.getElementById("treningInnstillinger").onclick = gloseTreningInnstillinger;
+	
+	gloseTreningGlose();
+}
+
+// Glosetid
+function gloseTidSetup() {
+	document.getElementById("overskrift").innerHTML = "<h2>Tid</h2>";
+	document.getElementById("innhold").innerHTML = "";
+	// Check browser support
+	if (typeof(Storage) !== "undefined") {
+		// Hvis funksjonen ikke er brukt foer, setter vi innstillingene til normal
+		if (!(localStorage.lat2GloseTidLagret)){
+			localStorage.lat2GloseTidLagret=JSON.stringify([-1,[],[],[],[],[],[],[],[],[],[],[]]);
+		}
+		
+		//sett opp skallet
+		document.getElementById("innhold").innerHTML = "<p>\
+		Leksjon: <span id=\"treningFrekvens\">0</span>\
+		<span class=\"hoyre\">Bunke: <span id=\"treningScore\">0</span></span></p>\
+		<div id=\"treningFlashcard\"><div id=\"treningGlose\">Glose</div></div>\
+		<div id=\"tidKnapper\"><br>\
+		<div class=\"box\">\
+		<button type=\"button\" id=\"treningVenstre\">---</button>\
+		</div>\
+		<div class=\"box\">\
+		<button type=\"button\" id=\"treningMidt\">Klar</button>\
+		</div>\
+		<div class=\"box\">\
+		<button type=\"button\" id=\"treningHoyre\">---</button><br><br></div>\
+		</div>\
+		<table width=330px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<col width=30px>\
+		<tr>\
+		<td><div id=\"stat1\" class=\"stat\"></div></td>\
+		<td><div id=\"stat2\" class=\"stat\"></div></td>\
+		<td><div id=\"stat3\" class=\"stat\"></div></td>\
+		<td><div id=\"stat4\" class=\"stat\"></div></td>\
+		<td><div id=\"stat5\" class=\"stat\"></div></td>\
+		<td><div id=\"stat6\" class=\"stat\"></div></td>\
+		<td><div id=\"stat7\" class=\"stat\"></div></td>\
+		<td><div id=\"stat8\" class=\"stat\"></div></td>\
+		<td><div id=\"stat9\" class=\"stat\"></div></td>\
+		<td><div id=\"stat10\" class=\"stat\"></div></td>\
+		<td><div id=\"stat11\" class=\"stat\"></div></td>\
+		</tr>\
+		<tr>\
+		<td>1</td>\
+		<td>2</td>\
+		<td>3</td>\
+		<td>4</td>\
+		<td>5</td>\
+		<td>6</td>\
+		<td>7</td>\
+		<td>8</td>\
+		<td>9</td>\
+		<td>10</td>\
+		<td>11</td>\
+		</tr>\
+		</table>\
+		<div id=\"advarsel\"></div>"
+		
+		//Sett opp foerste oppgave
+		gloseTidNeste();
+		gloseTidVisGlose();
+		gloseTidGrafikk();
+		
+		//Aktiver snarveier
+		document.addEventListener('keypress', visGloseSnarveier);
+
+	} else {
+    	document.getElementById("innhold").innerHTML = "Sorry, browseren din st&oslash;tter ikke web storage. Og da blir denne funksjonen litt ubrukelig...";
+	}
+}
+
+function visGloseSnarveier(e) {
+	var x = e.charCode || e.keyCode;
+	if (x == 66 || x == 98) {
+        document.getElementById("treningVenstre").click();
+    } else if (x == 78 || x == 110) {
+        document.getElementById("treningMidt").click();
+    } else if (x == 77 || x == 109) {
+        document.getElementById("treningHoyre").click();
+    }
+}
+
+function gloseTidGrafikk() {
+	var liste = ["stat1", "stat2", "stat3", "stat4", "stat5", "stat6", "stat7", "stat8", "stat9", "stat10", "stat11"]
+	var gloseTidMidlertidig = JSON.parse(localStorage.lat2GloseTidLagret);
+	for (var i = 1; i<12; i++) {
+		document.getElementById(liste[i-1]).style.height = Math.ceil(gloseTidMidlertidig[i].length/2)+"px";
+	}
+}
+
+function gloseTidNeste() {
+
+	//importer lagrede bunker
+	var gloseTidMidlertidig = JSON.parse(localStorage.lat2GloseTidLagret);
+	
+	//Hvis det er gitt 12 rette svar (- antall flytt nedover) ta et nytt kort
+	if (gloseTidTelling > 11) {
+		if (gloseTidMidlertidig[0] < ordlisteLengde-2) { //Men kun dersom det faktisk er flere kort
+			gloseTidTelling = 0;
+			gloseTidAktivGlose[0] = 0;
+			gloseTidAktivGlose[1] = gloseTidMidlertidig[0] + 1;
+			return
+		}
+	}
+	
+	//se etter klare ord - i neste bunke
+	//if (gloseTidTelling < 11) {
+	//	for (var i = gloseTidAktivGlose[0]+1; i<12; i++){
+	//		if (gloseTidMidlertidig[i].length > 0) {
+	//			var dagensDato = new Date().getTime();
+	//			if (dagensDato > gloseTidMidlertidig[i][0][0]) {
+	//				gloseTidAktivGlose[0] = i;
+	//				gloseTidAktivGlose[1] = gloseTidMidlertidig[i][0][1];
+	//				return
+	//			}
+	//		}
+	//	}
+	//}
+	
+	//se etter klare ord - i alle bunker
+	var dagensDato = new Date().getTime();
+	for (var i = 1; i<12; i++){
+		if (gloseTidMidlertidig[i].length > 0) {
+			if (dagensDato > gloseTidMidlertidig[i][0][0]) {
+				gloseTidAktivGlose[0] = i;
+				gloseTidAktivGlose[1] = gloseTidMidlertidig[i][0][1];
+				
+				//Ekstra kode for Haakon
+                    if (gloseTidMidlertidig[i][0][1] > ordlisteLengde-3){
+                        gloseTidMidlertidig[gloseTidAktivGlose[0]].shift();
+                        //lagre endringer
+                        localStorage.lat2GloseTidLagret=JSON.stringify(gloseTidMidlertidig);
+                        gloseTidNeste()
+                    }
+				return
+			}
+		}
+	}
+	
+	if (gloseTidMidlertidig[0] > ordlisteLengde-3) {
+		document.getElementById("advarsel").innerHTML = "OBS! Du er gjennom kortene, og dermed vil noen kort repeteres tidligere enn normalt.";
+		var x = 1 //Rekordnotering
+		var y = 0 //Husker i, dersom rekord
+		var z = 0 //Utregnes og sammenlignes med rekord
+		for (var i = 1; i<12; i++){
+			if (gloseTidMidlertidig[i].length > 0) {
+				z = (gloseTidMidlertidig[i][0][0] - dagensDato)/tidsintervaller[i-1]
+				if (z < x) {
+					y = i
+				}
+			}
+		}
+		gloseTidAktivGlose[0] = y;
+		gloseTidAktivGlose[1] = gloseTidMidlertidig[y][0][1];
+	} else {
+		//Hvis det ikke er noen kort som venter, men det fortsatt finnes ubrukte kort, ta et nytt kort
+		gloseTidTelling = 0;
+		gloseTidAktivGlose[0] = 0;
+		gloseTidAktivGlose[1] = gloseTidMidlertidig[0] + 1;
+	}
+	
+}
+
+function gloseTidRiktig() {
+
+	//Gi ett poeng
+	gloseTidTelling += 1;
+	
+	//importer lagrede bunker
+	var gloseTidMidlertidig = JSON.parse(localStorage.lat2GloseTidLagret);
+	if (gloseTidAktivGlose[0] == 0) {
+		gloseTidMidlertidig[0] = gloseTidMidlertidig[0] + 1;
+		gloseTidMidlertidig[1].push([new Date().getTime() + tidsintervaller[0], gloseTidAktivGlose[1]]);
+	} else if (gloseTidAktivGlose[0] == 11) {
+		gloseTidMidlertidig[11].shift();
+		gloseTidMidlertidig[11].push([new Date().getTime() + tidsintervaller[10], gloseTidAktivGlose[1]]);
+	} else {
+		gloseTidMidlertidig[gloseTidAktivGlose[0]].shift();
+		gloseTidMidlertidig[gloseTidAktivGlose[0]+1].push([new Date().getTime() + tidsintervaller[gloseTidAktivGlose[0]], gloseTidAktivGlose[1]]);
+	}
+	//lagre endringer
+	localStorage.lat2GloseTidLagret=JSON.stringify(gloseTidMidlertidig);
+	//sett opp neste oppgave
+	gloseTidNeste();
+	gloseTidVisGlose();
+	gloseTidGrafikk();
+}
+
+function gloseTidLett() {
+
+	//Gi fire poeng
+	gloseTidTelling += 4;
+	
+	//importer lagrede bunker
+	var gloseTidMidlertidig = JSON.parse(localStorage.lat2GloseTidLagret);
+	if (gloseTidAktivGlose[0] == 0) {
+		gloseTidMidlertidig[0] = gloseTidMidlertidig[0] + 1;
+		gloseTidMidlertidig[4].push([new Date().getTime() + tidsintervaller[3], gloseTidAktivGlose[1]]);
+	} else if (gloseTidAktivGlose[0] > 7) {
+		gloseTidMidlertidig[gloseTidAktivGlose[0]].shift();
+		gloseTidMidlertidig[11].push([new Date().getTime() + tidsintervaller[10], gloseTidAktivGlose[1]]);
+	} else {
+		gloseTidMidlertidig[gloseTidAktivGlose[0]].shift();
+		gloseTidMidlertidig[gloseTidAktivGlose[0]+4].push([new Date().getTime() + tidsintervaller[gloseTidAktivGlose[0]+3], gloseTidAktivGlose[1]]);
+	}
+	//lagre endringer
+	localStorage.lat2GloseTidLagret=JSON.stringify(gloseTidMidlertidig);
+	//sett opp neste oppgave
+	gloseTidNeste();
+	gloseTidVisGlose();
+	gloseTidGrafikk();
+}
+
+function gloseTidGalt() {
+
+	//Fjern saa mange poeng som det mistes
+	gloseTidTelling -= (gloseTidAktivGlose[0]-1);
+	
+	//importer lagrede bunker
+	var gloseTidMidlertidig = JSON.parse(localStorage.lat2GloseTidLagret);
+	if (gloseTidAktivGlose[0] == 0) {
+		gloseTidMidlertidig[0] = gloseTidMidlertidig[0] + 1;
+		gloseTidMidlertidig[1].push([new Date().getTime() + tidsintervaller[0], gloseTidAktivGlose[1]]);
+	} else {
+		gloseTidMidlertidig[gloseTidAktivGlose[0]].shift();
+		gloseTidMidlertidig[1].push([new Date().getTime() + tidsintervaller[0], gloseTidAktivGlose[1]]);
+	}
+	//lagre endringer
+	localStorage.lat2GloseTidLagret=JSON.stringify(gloseTidMidlertidig);
+	//sett opp neste oppgave
+	gloseTidNeste();
+	gloseTidVisGlose();
+	gloseTidGrafikk();
+}
+
+function gloseTidVisGlose() {
+	//Sett opp tekst
+	document.getElementById("treningFrekvens").innerHTML = ordliste[gloseTidAktivGlose[1]][3]; // gloseTidTelling;
+	document.getElementById("treningScore").innerHTML = gloseTidAktivGlose[0];
+	document.getElementById("treningGlose").innerHTML = ordliste[gloseTidAktivGlose[1]][0];
+	document.getElementById("treningVenstre").innerHTML = "---";
+	document.getElementById("treningMidt").innerHTML = "Klar (n)";
+	document.getElementById("treningHoyre").innerHTML = "---";
+	
+	//Gi knappene sine funksjoner
+	document.getElementById("treningVenstre").disabled = true;
+	document.getElementById("treningMidt").onclick = gloseTidVisFasit;
+	document.getElementById("treningHoyre").disabled = true;
+	
+}
+
+function gloseTidVisFasit() {
+	//Sett opp tekst
+	document.getElementById("treningGlose").innerHTML = ordliste[gloseTidAktivGlose[1]][1];
+	document.getElementById("treningVenstre").innerHTML = "For lett (b)";
+	document.getElementById("treningMidt").innerHTML = "Riktig (n)";
+	document.getElementById("treningHoyre").innerHTML = "Galt (m)";
+	
+	//Gi knappene sine funksjoner
+	document.getElementById("treningVenstre").disabled = false;
+	document.getElementById("treningVenstre").onclick = gloseTidLett;
+	document.getElementById("treningMidt").onclick = gloseTidRiktig;
+	document.getElementById("treningHoyre").disabled = false;
+	document.getElementById("treningHoyre").onclick = gloseTidGalt;
+}
+	
+
+
+    // Store:		localStorage.setItem("", "Smith");
+    // Retrieve:	document.getElementById("result").innerHTML = localStorage.getItem("lastname");
+    // Ut:			JSON.parse(localStorage.lat2GlosetreningLagret)
+    // Inn:			localStorage.lat2GlosetreningLagret=JSON.stringify(glosetreningMidlertidig);
+
+</script>
+</head>
+<body>
+<div class="helesiden">
+
+<div class="topp">
+<br>
+<div class="navigasjon">
+
+<a class="knapp" href="javascript:;" onclick="glosequizSetup()">Quiz</a>
+<a class="knapp" href="javascript:;" onclick="glosetreningSetup()">Poeng</a>
+<a class="knapp" href="javascript:;" onclick="gloseTidSetup()">Tid</a>
+
+</div>
+<br>
+</div>
+
+<div id="overskrift">
+<h2>Velkommen!</h2>
+</div>
+
+<div id="innhold">
+<p>Vennligst velg en metode for glosepugging.</p>
+<p><b>Kort om de forskjellige funksjonene:</b><br>
+<i>Quiz</i> genererer en multiple-choice-test av de glosene du velger. Du kan enten velge alle gloser for en leksjon med ett klikk, eller sette sammen ditt eget utvalg av ord basert p&aring; leksjoner og ordklasser og velge hvor mange oppgaver og alternativer som skal generereres.</p>
+<p>De to andre funksjonene er laget med utgangspunkt i hvordan man kan bruke flashcards. Det gis ingen alternativer, og du vurderer selv om du har greid oppgaven eller ikke. Programmet holder styr p&aring; kortene for deg, og s&oslash;rger for en riktig progresjon. Begge disse funksjonene krever at browseren din st&oslash;tter s&aring;kalt Web storage, som kan huske hvor langt du har kommet.</p>
+<p><i>Poeng</i> bruker et poengsystem, hvor hvert enkelt ord har en poengsum som starter p&aring; 50. N&aring;r du svarer feil mister du 15 poeng, n&aring;r du svarer rett f&aring;r du 10 poeng, og hvis du oppgir at du ikke vet svaret mister du 5 poeng. N&aring;r et ord har n&aring;dd 100 poeng tas det ut av &oslash;vingene, men det kan n&aring;r som helst dukke opp igjen som en tilfeldig repetisjon. N&aring;r du starter denne funksjonen settes det sammen en &oslash;kt best&aring;ende av 30 ord. Denne funksjonen egner seg godt til &aring; brukes over lengre tid, en gang eller to om dagen.</p>
+<p><i>Tid</i> egner seg bedre til intensiv glosepugging. Du kan se for deg at glosekortene ligger i opp til 11 forskjellige bunker. I den f&oslash;rste bunken m&aring; de ligge i minst fem sekunder f&oslash;r du ser dem igjen, i den neste i 25 sekunder, i den neste i to minutter, og s&aring; videre, helt opp til den siste bunken hvor de ikke repeteres f&oslash;r om to &aring;r. Hver gang man svarer riktig flyttes kortet videre til neste bunke, men dersom man svarer feil g&aring;r kortet tilbake til f&oslash;rste bunke. N&aring;r ingen kort er klare til repetisjon, tar man et nytt kort fra boksen, ser p&aring; det, og legger det i f&oslash;rste bunke. Denne metoden sikrer at glosene m&aring; huskes en viss tid f&oslash;r programmet regner med at du kan dem. Dersom man bruker funksjonen <i>Poeng</i> veldig hyppig, vil en glose kunne oppn&aring; 100 poeng p&aring; noen timer, uten at man husker den neste dag. Hvis man derimot bruker <i>Tid</i> mye, vil tidsintervallene v&aelig;re faste, og man vil heller jobbe med flere ord samtidig.</p>
+</div>
+<br><br>
+<div id="bunn">
+<i>Olav Brenns&aelig;ter, 2020</i><span class="hoyre">JS-Mau 1.0</span>
+</div>
+
+</div>
+</body>
+
+</html>
